@@ -1,7 +1,6 @@
 import signUpSchema from "../schemas/signUpSchema.js";
 import connection from "../dbStrategy/postgres.js";
-
-// https://bootcampra.notion.site/Qua-20-07-Pr-tica-Queries-SQL-ee71c590b2a243eda721db81058b1879
+import bcrypt from "bcrypt";
 
 export async function postSignUp(req, res) {
     try {
@@ -14,22 +13,32 @@ export async function postSignUp(req, res) {
             return res.send(error).status(422);
         }
 
-        // Verifica se o email existe
-        const { rows: alreadyExists } = await connection.query(`
-            SELECT * FROM users WHERE email='${newSignUp.email}';
-        `);
+        const doPasswordsCheck = (newSignUp.password === newSignUp.confirmPassword);
 
-        if (alreadyExists.length === 0) {
-            return res.sendStatus(409);
+        if (doPasswordsCheck) {
+            const encryptedPassword = bcrypt.hashSync(newSignUp.password, 10);
+
+            await connection.query(`
+            INSERT INTO users (
+                name,
+                email,
+                password
+            ) VALUES (
+                '${newSignUp.name}',
+                '${newSignUp.email}',
+                '${encryptedPassword}'
+            );`)
+            .then(() => res.sendStatus(201))
+            .catch(e => {
+                if (e.code === '23505') { // Código para unique_violation
+                    return res.status(409).send(e.detail);
+                } else {
+                    return res.sendStatus(500);
+                }
+            });
+        } else {
+            return res.send("Senhas não coincidem").status(422);
         }
-    
-        
-
-
-        const doPasswordsCheck = (password === passwordCheck);
-        const emailUsed = await usersCollection.findOne({ email });
-
-
     } catch(error) {
         return res.sendStatus(500);
     }

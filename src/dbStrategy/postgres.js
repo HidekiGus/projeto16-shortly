@@ -5,13 +5,11 @@ dotenv.config();
 
 const { Pool } = pg;
 
-const user = process.env.DB_USER;
-const password = process.env.DB_PASSWORD;
-const host = process.env.DB_HOST;
-const port = process.env.DB_PORT;
-const database = process.env.DB_DATABASE;
-
-console.log(password);
+const user = 'postgres';
+const password = '123456';
+const host = 'localhost';
+const port = 5432;
+const database = 'shortly';
 
 const connection = new Pool({
     user,
@@ -21,6 +19,6 @@ const connection = new Pool({
     database
 });
 
-connection.query('SELECT * FROM users;').then((response) => console.log(response));
+// connection.query(`INSERT INTO users (name, email, password) VALUES ('Gus', 'gus@gmail.com', '123abc');`).then((response) => console.log(response.rows)).catch(e => console.log(e.code));
 
 export default connection;
