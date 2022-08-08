@@ -71,3 +71,20 @@ export async function getUrlsId(req, res) {
         return res.sendStatus(500);
     }
 }
+
+// GET /urls/open/:shortUrl
+export async function getUrlsRedirect(req, res) {
+    try {
+        const shortUrl = req.params.shortUrl;
+        const { rows: shortUrlData } = await connection.query(`SELECT * FROM links WHERE "shortUrl"='${shortUrl}';`);
+        if (shortUrlData.rowCount === 0) {
+            return res.sendStatus(404);
+        } else {
+            const addVisit = shortUrlData[0].visits + 1;
+            await connection.query(`UPDATE links SET visits=${addVisit} WHERE "shortUrl"='${shortUrl}';`);
+            return res.redirect(shortUrlData[0].originalUrl);
+        }
+    } catch(error) {
+        return res.sendStatus(500);
+    }
+}
