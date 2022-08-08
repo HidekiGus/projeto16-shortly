@@ -1,4 +1,4 @@
-import connection from "../dbStrategy/postgres";
+import connection from "../dbStrategy/postgres.js";
 
 export async function getRanking(req, res) {
     const { rows: data } = await connection.query(`
