@@ -52,3 +52,22 @@ export async function postUrlsShorten(req, res) {
         return res.sendStatus(500);
     }
 }
+
+// GET /urls/:id
+export async function getUrlsId(req, res) {
+    try {
+        const id = req.params.id;
+        const { rows: data } = await connection.query(`SELECT * FROM links WHERE id=${id};`);
+
+        if (data.length === 0 ) { // If link was not found using id
+            return res.sendStatus(404);
+        } else { // If link was found
+            delete data[0].visits;
+            delete data[0].userId;
+            delete data[0].createdAt;
+            res.send(data).status(200);
+        }
+    } catch(error) {
+        return res.sendStatus(500);
+    }
+}
