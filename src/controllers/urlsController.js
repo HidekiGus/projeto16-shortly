@@ -10,11 +10,9 @@ export async function postUrlsShorten(req, res) {
         const { url: longUrl } = req.body;
 
         if (!authorization) { // If the authorization header is absent
-
             return res.status(422).send("Authorization não enviado");
-
         } else { // If the authorization is present
-
+            
             const urlSchema = joi.object({ // Checks the req body
                 url: joi.string().uri().required()
             });
