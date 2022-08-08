@@ -25,7 +25,7 @@ export async function getUsersMe(req, res) {
         const { rows: shortenedUrlsData } = await connection.query(`
         SELECT links.id as id, links."shortUrl" as "shortUrl", links."originalUrl" as "url", links.visits as "visitCount"
         FROM links
-        WHERE "userId"=28;
+        WHERE "userId"=${userData[0].id};
         `);
 
         const obj = {
