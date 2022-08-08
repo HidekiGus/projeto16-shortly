@@ -88,3 +88,36 @@ export async function getUrlsRedirect(req, res) {
         return res.sendStatus(500);
     }
 }
+
+// DELETE /urls/:id
+export async function deleteUrlById(req, res) {
+    try {
+        const id = req.params.id;
+        const { authorization } = req.headers;
+
+        if (!authorization) { // If authorization was not sent
+            return res.sendStatus(401);
+        }
+
+        const token = authorization.replace("Bearer ", "");
+
+        const { rows: tokenData } = await connection.query(`SELECT * FROM sessions WHERE token='${token}';`);
+        if (tokenData.length === 0) { //  If token was not found in sessions
+            return res.sendStatus(401);
+        }
+
+        const { rows: urlData } = await connection.query(`SELECT * FROM links WHERE id=${id};`);
+        if (urlData.length === 0) { // If url was not found by id
+            return res.sendStatus(404);
+        }
+
+        if (tokenData[0].userId !== urlData[0].userId) { // If user that requested is different than who created
+            return res.sendStatus(401);
+        } 
+
+        await connection.query(`DELETE FROM links WHERE id=${id};`);
+        return res.sendStatus(204);
+    } catch(error) {
+        return res.sendStatus(500);
+    }
+}
