@@ -11,7 +11,7 @@ export async function getUsersMe(req, res) {
         const token = authorization.replace("Bearer ", "");
 
         const { rows: userData } = await connection.query(`
-        SELECT users.id as id, users.name as name, SUM(links.visits) as "visitCounts"
+        SELECT users.id as id, users.name as name, SUM(links.visits) as "visitCount"
         FROM links
         JOIN users
         ON users.id=links."userId"
